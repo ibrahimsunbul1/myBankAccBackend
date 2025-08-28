@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,7 +23,21 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     
     @Query("SELECT u FROM User u WHERE u.isActive = true")
-    java.util.List<User> findAllActiveUsers();
+    List<User> findAllActiveUsers();
+    
+    Optional<User> findByTcKimlikNo(String tcKimlikNo);
+    
+    Optional<User> findByMusteriNo(String musteriNo);
+    
+    @Query("SELECT u FROM User u WHERE u.tcKimlikNo = ?1 AND u.isActive = true")
+    Optional<User> findActiveUserByTcKimlikNo(String tcKimlikNo);
+    
+    @Query("SELECT u FROM User u WHERE u.musteriNo = ?1 AND u.isActive = true")
+    Optional<User> findActiveUserByMusteriNo(String musteriNo);
+    
+    boolean existsByTcKimlikNo(String tcKimlikNo);
+    
+    boolean existsByMusteriNo(String musteriNo);
     
     @Query("SELECT u FROM User u WHERE u.username = :username AND u.isActive = true")
     Optional<User> findActiveUserByUsername(@Param("username") String username);

@@ -46,6 +46,12 @@ public class User implements UserDetails {
     @Column(name = "phone_number")
     private String phoneNumber;
     
+    @Column(name = "tc_kimlik_no", unique = true, length = 11)
+    private String tcKimlikNo;
+    
+    @Column(name = "musteri_no", unique = true, length = 11)
+    private String musteriNo;
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
@@ -192,6 +198,26 @@ public class User implements UserDetails {
     
     public void setRole(Role role) {
         this.role = role;
+    }
+    
+    public String getTcKimlikNo() {
+        return tcKimlikNo;
+    }
+    
+    public void setTcKimlikNo(String tcKimlikNo) {
+        this.tcKimlikNo = tcKimlikNo;
+    }
+    
+    public String getMusteriNo() {
+        return musteriNo;
+    }
+    
+    public void setMusteriNo(String musteriNo) {
+        this.musteriNo = musteriNo;
+    }
+    
+    public String getFullName() {
+        return firstName + " " + lastName;
     }
     
     @PreUpdate
