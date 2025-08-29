@@ -26,6 +26,10 @@ public class UserRegistrationDto {
     @Size(min = 11, max = 11, message = "TC Kimlik No must be 11 digits")
     private String tcKimlikNo;
     
+    @NotBlank(message = "Phone number is required")
+    @Size(min = 10, max = 10, message = "Phone number must be 10 digits")
+    private String phoneNumber;
+    
     // Getters and Setters
     public String getUsername() {
         return username;
@@ -73,5 +77,13 @@ public class UserRegistrationDto {
     
     public void setTcKimlikNo(String tcKimlikNo) {
         this.tcKimlikNo = tcKimlikNo;
+    }
+    
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

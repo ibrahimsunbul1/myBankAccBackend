@@ -213,6 +213,7 @@ public class UserController {
         newUser.setFirstName(registrationDto.getFirstName());
         newUser.setLastName(registrationDto.getLastName());
         newUser.setTcKimlikNo(registrationDto.getTcKimlikNo());
+        newUser.setPhoneNumber(registrationDto.getPhoneNumber());
         newUser.setRole(User.Role.USER);
         newUser.setIsActive(true);
         

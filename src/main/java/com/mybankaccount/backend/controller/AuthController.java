@@ -10,6 +10,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -56,7 +59,8 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest, 
+                                     HttpServletRequest request, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -65,19 +69,26 @@ public class AuthController {
                 )
             );
             
+            // Set authentication in SecurityContext
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            
+            // Explicitly save SecurityContext to session
+            HttpSessionSecurityContextRepository securityContextRepository = 
+                new HttpSessionSecurityContextRepository();
+            securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+            
             User user = (User) authentication.getPrincipal();
             
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Login successful");
-            response.put("userId", user.getId());
-            response.put("username", user.getUsername());
-            response.put("email", user.getEmail());
-            response.put("firstName", user.getFirstName());
-            response.put("lastName", user.getLastName());
-            response.put("role", user.getRole());
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("message", "Login successful");
+            responseMap.put("userId", user.getId());
+            responseMap.put("username", user.getUsername());
+            responseMap.put("email", user.getEmail());
+            responseMap.put("firstName", user.getFirstName());
+            responseMap.put("lastName", user.getLastName());
+            responseMap.put("role", user.getRole());
             
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(responseMap);
             
         } catch (AuthenticationException e) {
             Map<String, String> error = new HashMap<>();
@@ -87,13 +98,19 @@ public class AuthController {
     }
     
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity<?> logoutUser(HttpServletRequest request, HttpServletResponse response) {
+        // Clear SecurityContext
         SecurityContextHolder.clearContext();
         
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Logout successful");
+        // Invalidate session if exists
+        if (request.getSession(false) != null) {
+            request.getSession().invalidate();
+        }
         
-        return ResponseEntity.ok(response);
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put("message", "Logout successful");
+        
+        return ResponseEntity.ok(responseMap);
     }
     
     @GetMapping("/me")

@@ -27,8 +27,20 @@ public class UserService implements UserDetailsService {
     
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findActiveUserByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        // First try to find by username
+        Optional<User> user = userRepository.findActiveUserByUsername(username);
+        
+        // If not found by username, try TC Kimlik No
+        if (user.isEmpty()) {
+            user = userRepository.findActiveUserByTcKimlikNo(username);
+        }
+        
+        // If still not found, try Müşteri No
+        if (user.isEmpty()) {
+            user = userRepository.findActiveUserByMusteriNo(username);
+        }
+        
+        return user.orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
     
     public User createUser(User user) {
